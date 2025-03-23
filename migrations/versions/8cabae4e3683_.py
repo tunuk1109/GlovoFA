@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 4a2a50a9ab0d
-Revises: 0091d30c1a07
-Create Date: 2025-03-09 15:02:04.790122
+Revision ID: 8cabae4e3683
+Revises: 
+Create Date: 2025-03-16 11:42:07.703060
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4a2a50a9ab0d'
-down_revision: Union[str, None] = '0091d30c1a07'
+revision: str = '8cabae4e3683'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -26,6 +26,22 @@ def upgrade() -> None:
     sa.Column('category_name', sa.String(length=32), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('category_name')
+    )
+    op.create_table('user_profile',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('first_name', sa.String(length=32), nullable=False),
+    sa.Column('last_name', sa.String(length=32), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('phone_number', sa.String(), nullable=True),
+    sa.Column('profile_image', sa.String(), nullable=True),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('status', sa.Enum('client', 'owner', 'courier', name='statuschoicess'), nullable=False),
+    sa.Column('date_registered', sa.DateTime(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
     )
     op.create_table('courier_rating',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -123,5 +139,6 @@ def downgrade() -> None:
     op.drop_table('store')
     op.drop_table('order')
     op.drop_table('courier_rating')
+    op.drop_table('user_profile')
     op.drop_table('category')
     # ### end Alembic commands ###

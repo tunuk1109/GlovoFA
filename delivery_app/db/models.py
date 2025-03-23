@@ -1,9 +1,10 @@
-from sqlalchemy import String, Integer, Enum, DateTime, Float, DECIMAL, Text, ForeignKey
-from database import Base
+from sqlalchemy import String, Integer, Enum, DateTime, DECIMAL, Text, ForeignKey
+from delivery_app.db.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, List
 from enum import Enum as PyEnum
-from datetime import datetime, date
+from datetime import datetime
+from passlib.hash import bcrypt
 
 
 class StatusChoicess(str, PyEnum):
@@ -31,6 +32,7 @@ class UserProfile(Base):
     first_name: Mapped[str] = mapped_column(String(32))
     last_name: Mapped[str] = mapped_column(String(32))
     username: Mapped[str] = mapped_column(String, unique=True)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     profile_image: Mapped[Optional[str]] = mapped_column(String, nullable=True)
@@ -51,7 +53,24 @@ class UserProfile(Base):
                                                                  cascade='all, delete-orphan')
     rating_courier: Mapped[List['CourierRating']] = relationship('CourierRating', back_populates='courier_rating', foreign_keys='CourierRating.courier_id',
                                                                  cascade='all, delete-orphan')
+    token_user: Mapped[List['RefreshToken']] = relationship('RefreshToken', back_populates='user_token',
+                                                            cascade='all, delete-orphan')
 
+    def set_passwords(self, password: str):
+        self.hashed_password = bcrypt.hash(password)
+
+    def check_password(self, password: str):
+        return bcrypt.verify(password, self.hashed_password)
+
+
+class RefreshToken(Base):
+    __tablename__ = 'refresh_token'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    token: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    created_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user_profile.id'))
+    user_token: Mapped['UserProfile'] = relationship('UserProfile', back_populates='token_user')
 
 
 class Category(Base):

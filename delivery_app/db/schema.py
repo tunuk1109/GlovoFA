@@ -1,7 +1,7 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
-from datetime import datetime, date
-from models import StatusChoicess, OrderStatusChoicess, CourierStatusChoicess
+from pydantic import EmailStr
+from datetime import datetime
+from delivery_app.db.models import StatusChoicess, OrderStatusChoicess, CourierStatusChoicess
 from pydantic import BaseModel
 
 
@@ -10,10 +10,11 @@ class UserProfileSchema(BaseModel):
     first_name: str
     last_name: str
     username: str
+    hashed_password: str
     email: EmailStr
-    phone_number: str
-    profile_image: Optional[str]
-    age: Optional[int]
+    phone_number: Optional[str] = None
+    profile_image: Optional[str] = None
+    age: Optional[int] = None
     status: StatusChoicess
     date_registered: datetime
 
@@ -36,8 +37,8 @@ class StoreSchema(BaseModel):
 class ContactSchema(BaseModel):
     id: int
     title: str
-    contact_number: Optional[str]
-    social_network: Optional[str]
+    contact_number: Optional[str] = None
+    social_network: Optional[str] = None
     store_id: int
 
 
@@ -79,8 +80,8 @@ class StoreReviewSchema(BaseModel):
     id: int
     client_id: int
     store_id: int
-    text: str
-    stars: int
+    text: Optional[str] = None
+    stars: Optional[int] = None
     created_date: datetime
 
 
